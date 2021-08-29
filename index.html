@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/help.css">
+    <link rel="stylesheet" href="css/modal.css">
+    <title>Empire</title>
+</head>
+<body>
+    <div class="overlap" hidden>
+        <div id="modal">
+            <div class="modal-title">
+                <p class="title-modal">Informations</p>
+                <hr>
+                <button class="btn-modal">X</button>
+            </div>
+            <div class="modal-content">
+            
+
+            </div>
+            <div class="modal-content-cover">
+            
+            </div>
+        </div>
+    </div>
+
+    <a href="#ancre"><button class="btn-ancre" >UP</button></a>
+    <header id="ancre" class="container ">
+        <img src="logo.png" alt="Logo">
+        <h1>Empire Music</h1>
+    </header>
+    
+    <section class="search container">
+        <form class="form">
+            <input class="search-zone" type="text" value='' placeholder="artist/album/title..." min="1" max="50" required>
+            <select class="select-option" name="select" id="select">
+            <option value="Everything">Everything</option>
+            <option value="Artist">Artist</option>
+            <option value="Album">Album</option>
+            <option value="Title">Title</option>
+            </select>
+            <button class="search-btn">Search</button>
+        </form>
+    </section>
+        <hr class="hr-affi container">
+        <div class="affichage-exemple container">
+            <h3>#</h3>
+            <h3>Artist</h3>
+            <h3>Title</h3>
+            <h3>Album</h3>
+            <h3>Action</h3>
+        </div>
+        <hr class="hr-affi container">
+        <p class="load">...Loading</p>
+        <section class='affichage container'>
+            <div class="msgNoContent"> 
+                <p>Enter a search element</p>
+            </div>
+        </section>
+        
+    <script src="script.js"></script>
+    <script src="modal.js"></script>
+</body>
+</html>

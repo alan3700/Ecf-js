@@ -8,6 +8,7 @@ const select = document.querySelector('.select-option');
 const body = document.querySelector('body');
 const zoneNoContent = document.querySelector('.msgNoContent');
 const load = document.querySelector('.load');
+const modalCover= document.querySelector('.modal-content-cover');
 
 load.style.visibility = 'hidden';
 let offsetVar = 1;
@@ -36,6 +37,9 @@ form.addEventListener('submit', function (ev) {
 let countRequest = document.createElement('p');
 function printCount(count){
     countRequest.textContent = count +' resultat' ;
+    if(count <=100){
+        btnMore.style.visibility='hidden'
+    }
     if(count <= 0){
         btnMore.style.visibility ='hidden'
         let zoneNoResult= document.createElement('div');
@@ -84,6 +88,7 @@ function addrequest(nbr,artist,title,album,length,ratingID,cover,tabTag){
     
 
     actionId.addEventListener('click',function(){
+        modalCover.textContent=' ';
         showModal()
         addModal(artist,title,album,length,ratingID,cover,tabTag)
     });
@@ -140,8 +145,6 @@ function addModal(artist,title,album,length,ratingID,cover,tabTag){
     modalContent.appendChild(albumModal)
     modalContent.appendChild(lengthModal)
     modalContent.appendChild(tagModal)
-    modalContent.appendChild(lineModal)
-    modalContent.appendChild(coverTitle)
     
 
 
@@ -367,12 +370,6 @@ function addRatings(ratingID){
                 noteRating.textContent='Note :'+responseRatings.rating.value+'/5' ;
                 modalContent.appendChild(noteRating);
             }else{
-                if(requestRating.status == 404){
-                    let noteRating = document.createElement('h3');
-                    noteRating.className='noteRating';
-                    noteRating.textContent='no notes found for this song';
-                    modalContent.appendChild(noteRating);
-                }
             }
         }
     })
@@ -383,8 +380,10 @@ function addCover(cover){
 const requestCover = new XMLHttpRequest();
     requestCover.open('GET','http://coverartarchive.org/release/'+cover, true);
     requestCover.addEventListener('readystatechange', function () {
+        load.style.visibility = 'visible';
         if (requestCover.readyState === XMLHttpRequest.DONE) {
             if (requestCover.status === 200) {
+                load.style.visibility = 'hidden';
                 console.log('request good');
                 let responseCover = JSON.parse(requestCover.responseText);
                 console.log(responseCover)
@@ -392,14 +391,14 @@ const requestCover = new XMLHttpRequest();
 
                     let imgModal = document.createElement('img');
                     imgModal.src = responseCover.images[i]['thumbnails'].small
-                    modalContent.appendChild(imgModal);
+                    modalCover.appendChild(imgModal);
                 }
                 }
                 if((requestCover.status == 404) ||(requestCover.status == 400)){
                     let coverLess = document.createElement('p');
                     coverLess.className='coverLess'
                     coverLess.textContent = 'No cover was find for this album'
-                    modalContent.appendChild(coverLess)
+                    modalCover.appendChild(coverLess)
                 }
             } else {
                 console.log(requestCover.status);

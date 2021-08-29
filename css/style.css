@@ -70,7 +70,14 @@ header img{
 }
 
 .modal-content h3{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
     margin-bottom: 2rem;
+}
+.modal-content-cover{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    place-items: center;
 }
 
 .btn-ancre{

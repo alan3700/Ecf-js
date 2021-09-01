@@ -9,6 +9,10 @@ const body = document.querySelector('body');
 const zoneNoContent = document.querySelector('.msgNoContent');
 const load = document.querySelector('.load');
 const modalCover= document.querySelector('.modal-content-cover');
+const exTitle=document.querySelector('.ex-title');
+const exArtist=document.querySelector('.ex-artist');
+const exAlbum=document.querySelector('.ex-album');
+const exempleAffi=document.querySelector('.affichage-exemple');
 
 load.style.visibility = 'hidden';
 let offsetVar = 1;
@@ -20,17 +24,28 @@ btnMore.textContent='more'
 
 form.addEventListener('submit', function (ev) {
     ev.preventDefault();
+    exempleAffi.style.color='black';
+    exTitle.style.color='black';
+    exArtist.style.color='black';
+    exAlbum.style.color='black';
     affi.textContent = ' ';
     offsetVar = 1;
     addMore()
     if (select.value == 'Title'){
-    Title(offsetVar);
+        exTitle.style.color='orange';
+        Title(offsetVar);
     }else if(select.value == 'Artist'){
-    Artist(offsetVar);
+        exArtist.style.color='orange';
+        Artist(offsetVar);
     }else if (select.value == 'Album'){
-    Album(offsetVar);
+        exAlbum.style.color='orange';
+        Album(offsetVar);
     }else if(select.value == 'Everything'){
-    Everything(offsetVar);
+        exempleAffi.style.color='orange';
+        exTitle.style.color='orange';
+        exArtist.style.color='orange';
+        exAlbum.style.color='orange';
+        Everything(offsetVar);
     }
 })
 
@@ -53,7 +68,7 @@ function printCount(count){
         zoneNoResult.appendChild(msgNoResult)
         searchZone.appendChild(countRequest)
     }else{
-    countRequest.textContent = count +' resultat' ;
+    countRequest.textContent = count-1 +' resultat' ;
     searchZone.appendChild(countRequest)
     }
 }
@@ -169,7 +184,7 @@ function addMore(){
 
 function Title(offsetVar){
     const requestTitle = new XMLHttpRequest();
-    requestTitle.open('GET', 'https://musicbrainz.org/ws/2/recording?limit=100&offset='+offsetVar+'&status:official&fmt=json&query='+ '"'+encodeURIComponent(zoneInput.value)+'"', true);
+    requestTitle.open('GET', 'https://musicbrainz.org/ws/2/recording?limit=100&offset='+offsetVar+'&fmt=json&query=recording:'+ '"'+encodeURIComponent(zoneInput.value)+'"', true);
     requestTitle.addEventListener('readystatechange', function () {
         load.style.visibility = 'visible';
         if (requestTitle.readyState === XMLHttpRequest.DONE) {
@@ -178,18 +193,24 @@ function Title(offsetVar){
                 load.style.visibility = 'hidden';
                 let response = JSON.parse(requestTitle.responseText);
                 console.log(response) ;
-                let variab =offsetVar;
                 printCount(response.count)
                 for (let i = 0;i<response.recordings.length;i++){
+                    let tabAlb=[];
                     if(response.recordings[i].releases == undefined){
-                        albumTitle = 'Undefined' ;
+                        tabAlb = 'Undefined' ;
                     }else{
+                        for(l in response.recordings[i].release){
+                            tabAlb.push( response.recordings[i].releases[l].title)
+                            }
                         albumTitle = response.recordings[i]['releases'][0].title ;
                     }
-                    if(response.recordings[i]['releases'] == undefined){
+                    let coverId=[];
+                    if(response.recordings[i]['releases'] === undefined){
                         coverId = 'Undefined' ;
                     }else{
-                        coverId = response.recordings[i]['releases'][0].id ;
+                        for(l in response.recordings[i].releases){
+                            coverId.push(response.recordings[i]['releases'][l].id )
+                            }
                     }
                     let tabTag=[];
                     if(response.recordings[i]['tags'] == undefined){
@@ -204,8 +225,11 @@ function Title(offsetVar){
                     }else{
                         lengthMusic= response.recordings[i].length
                     }
-                    
-                    addrequest(variab++,response.recordings[i]['artist-credit'][0].name,response.recordings[i].title,albumTitle,Math.floor
+                    let tabArtist=[];
+                    for(l in response.recordings[i]['artist-credit']){
+                        tabArtist.push(response.recordings[i]['artist-credit'][l].name)
+                        }
+                    addrequest(offsetVar++,tabArtist,response.recordings[i].title,albumTitle,Math.round
                     (lengthMusic/1000/60),response.recordings[i].id,coverId,tabTag)
                 }
             } else {
@@ -225,14 +249,16 @@ function Artist(offsetVar){
                 load.style.visibility = 'hidden';
                 console.log('request good');
                 let responseArtist = JSON.parse(requestArtist.responseText);
-                let variab = offsetVar;
                 printCount(responseArtist.count);
                 console.log(responseArtist)
                 for (let i = 0;i<responseArtist.recordings.length;i++){
+                    let tabAlb=[];
                     if(responseArtist.recordings[i].releases == undefined){
-                        albumTitle = 'Undefined' ;
+                        tabAlb = 'Undefined' ;
                     }else{
-                        albumTitle = responseArtist.recordings[i]['releases'][0].title ;
+                        for(l in responseArtist.recordings[i].releases){
+                            tabAlb.push( responseArtist.recordings[i].releases[l].title)
+                            }
                     }
                     if (responseArtist.recordings[i].length === undefined){
                         lengthMusic = 'No length for this song'
@@ -247,13 +273,23 @@ function Artist(offsetVar){
                             tabTag.push( responseArtist.recordings[i].tags[l].name)
                             }
                     }
+                    let coverId=[];
                     if(responseArtist.recordings[i]['releases'] === undefined){
                         coverId = 'Undefined' ;
                     }else{
-                        coverId = responseArtist.recordings[i]['releases'][0].id ;
+                        for(l in responseArtist.recordings[i].releases){
+                            coverId.push(responseArtist.recordings[i]['releases'][l].id )
+                            }
+
                     }
-                    addrequest(variab++,responseArtist.recordings[i]['artist-credit'][0].name,responseArtist.recordings[i].title,albumTitle,Math.round(lengthMusic/1000/60),responseArtist.recordings[i].id,coverId,tabTag)
+                    console.log(coverId)
+                    let tabArtist=[];
+                    for(l in responseArtist.recordings[i]['artist-credit']){
+                        tabArtist.push(responseArtist.recordings[i]['artist-credit'][l].name)
+                        }
+                    addrequest(offsetVar++,tabArtist,responseArtist.recordings[i].title,tabAlb,Math.round(lengthMusic/1000/60),responseArtist.recordings[i].id,coverId,tabTag)
                 }
+                
                 
             } else {
                 console.log(requestArtist.status);
@@ -275,17 +311,19 @@ function Album(offsetVar){
                 let responseAlbum = JSON.parse(requestAlbum.responseText);
                 console.log(responseAlbum)
                 printCount(responseAlbum.count);
-                let variab = offsetVar
                 for (let i = 0;i<responseAlbum.recordings.length;i++){
                     if (responseAlbum.recordings[i].length === undefined){
                         lengthMusic = 'No length for this song'
                     }else{
                         lengthMusic= responseAlbum.recordings[i].length
                     }
+                    let tabAlb=[];
                     if(responseAlbum.recordings[i].releases == undefined){
-                        albumTitle = 'Undefined' ;
+                        tabAlb = 'Undefined' ;
                     }else{
-                        albumTitle = responseAlbum.recordings[i]['releases'][0].title ;
+                        for(l in responseAlbum.recordings[i].releases){
+                            tabAlb.push( responseAlbum.recordings[i].releases[l].title)
+                            }
                     }
                     let tabTag=[];
                     if(responseAlbum.recordings[i]['tags'] == undefined){
@@ -295,12 +333,19 @@ function Album(offsetVar){
                             tabTag.push( responseAlbum.recordings[i].tags[l].name)
                             }
                     }
-                    if(responseAlbum.recordings[i]['releases'] == undefined){
+                    let coverId=[];
+                    if(responseAlbum.recordings[i]['releases'] === undefined){
                         coverId = 'Undefined' ;
                     }else{
-                        coverId = responseAlbum.recordings[i]['releases'][0]['status-id'] ;
+                        for(l in responseAlbum.recordings[i].releases){
+                            coverId.push(responseAlbum.recordings[i]['releases'][l].id )
+                            }
                     }
-                    addrequest(variab++,responseAlbum.recordings[i]['artist-credit'][0].name,responseAlbum.recordings[i].title,albumTitle,Math.round(lengthMusic/1000/60),responseAlbum.recordings[i].id,coverId,tabTag)
+                    let tabArtist=[];
+                    for(l in responseAlbum.recordings[i]['artist-credit']){
+                        tabArtist.push(responseAlbum.recordings[i]['artist-credit'][l].name)
+                        }
+                    addrequest(offsetVar++,tabArtist,responseAlbum.recordings[i].title,tabAlb,Math.round(lengthMusic/1000/60),responseAlbum.recordings[i].id,coverId,tabTag)
                 }
             } else {
                 console.log(requestAlbum.status);
@@ -312,7 +357,7 @@ function Album(offsetVar){
 
 function Everything(offsetVar){
     const requestEverything = new XMLHttpRequest();
-    requestEverything.open('GET', 'https://musicbrainz.org/ws/2/recording?inc=tags&limit=100&offset='+offsetVar+'primarytype=album&fmt=json&query='+ '"' + encodeURIComponent(zoneInput.value)+ '"', true) ;
+    requestEverything.open('GET', 'https://musicbrainz.org/ws/2/recording?&limit=100&offset='+offsetVar+'&fmt=json&query='+ '"' + encodeURIComponent(zoneInput.value)+ '"', true) ;
     requestEverything.addEventListener('readystatechange', function () {
         load.style.visibility = 'visible';
         if (requestEverything.readyState === XMLHttpRequest.DONE) {
@@ -322,17 +367,19 @@ function Everything(offsetVar){
                 let responseEverything = JSON.parse(requestEverything.responseText);
                 console.log(responseEverything)
                 printCount(responseEverything.count);
-                let variab = offsetVar
                 for (let i = 0;i<responseEverything.recordings.length;i++){
                     if (responseEverything.recordings[i].length === undefined){
                         lengthMusic = 'No length for this song'
                     }else{
                         lengthMusic= responseEverything.recordings[i].length
                     }
+                    let tabAlb=[];
                     if(responseEverything.recordings[i].releases == undefined){
-                        albumTitle = 'Undefined' ;
+                        tabAlb = 'Undefined' ;
                     }else{
-                        albumTitle = responseEverything.recordings[i]['releases'][0].title ;
+                        for(l in responseEverything.recordings[i].releases){
+                            tabAlb.push( responseEverything.recordings[i].releases[l].title)
+                            }
                     }
                     let tabTag=[];
                     if(responseEverything.recordings[i]['tags'] == undefined){
@@ -342,12 +389,20 @@ function Everything(offsetVar){
                             tabTag.push( responseEverything.recordings[i].tags[l].name)
                             }
                     }
-                    if(responseEverything.recordings[i]['releases'] == undefined){
+                    
+                    let coverId=[];
+                    if(responseEverything.recordings[i]['releases'] === undefined){
                         coverId = 'Undefined' ;
                     }else{
-                        coverId = responseEverything.recordings[i]['releases'][0].id ;
+                        for(l in responseEverything.recordings[i].releases){
+                            coverId.push(responseEverything.recordings[i]['releases'][l].id )
+                            }
                     }
-                    addrequest(variab++,responseEverything.recordings[i]['artist-credit'][0].name,responseEverything.recordings[i].title,albumTitle,Math.round(lengthMusic/1000/60),responseEverything.recordings[i].id,coverId,tabTag)
+                    let tabArtist=[];
+                    for(l in responseEverything.recordings[i]['artist-credit']){
+                        tabArtist.push(responseEverything.recordings[i]['artist-credit'][l].name)
+                        }
+                    addrequest(offsetVar++,tabArtist,responseEverything.recordings[i].title,tabAlb,Math.round(lengthMusic/1000/60),responseEverything.recordings[i].id,coverId,tabTag)
                 }
                 
             } else {
@@ -367,9 +422,15 @@ function addRatings(ratingID){
                 console.log(responseRatings)
                 let noteRating = document.createElement('h3');
                 noteRating.className='noteRating';
+                if(responseRatings.rating.value===null){
+                    noteRating.textContent='Note : No rating for this song';
+                    modalContent.appendChild(noteRating);
+                }else{
                 noteRating.textContent='Note :'+responseRatings.rating.value+'/5' ;
                 modalContent.appendChild(noteRating);
+                }
             }else{
+               
             }
         }
     })
@@ -377,8 +438,9 @@ function addRatings(ratingID){
 }
 
 function addCover(cover){
+    for(i=0;i<cover.length;i++){
 const requestCover = new XMLHttpRequest();
-    requestCover.open('GET','http://coverartarchive.org/release/'+cover, true);
+    requestCover.open('GET','http://coverartarchive.org/release/'+cover[i], true);
     requestCover.addEventListener('readystatechange', function () {
         load.style.visibility = 'visible';
         if (requestCover.readyState === XMLHttpRequest.DONE) {
@@ -388,21 +450,22 @@ const requestCover = new XMLHttpRequest();
                 let responseCover = JSON.parse(requestCover.responseText);
                 console.log(responseCover)
                 for (let i = 0;i<responseCover.images.length;i++){
-
                     let imgModal = document.createElement('img');
-                    imgModal.src = responseCover.images[i]['thumbnails'].small
+                    imgModal.src = responseCover.images[i]['thumbnails'].small;
                     modalCover.appendChild(imgModal);
                 }
                 }
-                if((requestCover.status == 404) ||(requestCover.status == 400)){
-                    let coverLess = document.createElement('p');
-                    coverLess.className='coverLess'
-                    coverLess.textContent = 'No cover was find for this album'
-                    modalCover.appendChild(coverLess)
-                }
+                // if((requestCover.status == 404) ||(requestCover.status == 400)){
+                //     let coverLess = document.createElement('p');
+                //     coverLess.className='coverLess';
+                //     coverLess.textContent = 'No cover was find for this album';
+                //     modalCover.appendChild(coverLess)
+                // }
             } else {
                 console.log(requestCover.status);
+
             }
         })
     requestCover.send();
+    }
 }

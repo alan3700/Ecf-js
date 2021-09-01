@@ -1,4 +1,5 @@
 const overlap = document.querySelector(".overlap");
+const modal = document.querySelector('.modal');
 const modalTitle = document.querySelector(".titleModal");
 const modalArtist = document.querySelector(".artistModal");
 const modalAlbum = document.querySelector(".albumModal");
